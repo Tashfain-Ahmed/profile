@@ -2,7 +2,9 @@ const canvas = document.querySelector('#ring');
 const g = canvas.getContext('2d');
 const surface = document.querySelector('#instrument');
 const note = document.querySelector('#note');
-const floatingTags = Array.from(document.querySelectorAll('.tag, .chip'));
+const projectTitle = document.querySelector('#projectTitle');
+const projectText = document.querySelector('#projectText');
+const nodes = Array.from(document.querySelectorAll('.node'));
 
 let w = innerWidth;
 let h = innerHeight;
@@ -28,6 +30,41 @@ function updateHud() {
   });
 }
 
+function updateOrbit() {
+  const orbitRadius = Math.min(w, h) * 0.22;
+  const centerX = w / 2;
+  const centerY = h / 2;
+  const baseAngles = [0.4, 1.3, 2.3, 3.6];
+
+  nodes.forEach((node, index) => {
+    const angle = baseAngles[index] + phase * 0.3;
+    const px = centerX + Math.cos(angle) * orbitRadius;
+    const py = centerY + Math.sin(angle) * orbitRadius * 0.9;
+    node.style.left = `${px}px`;
+    node.style.top = `${py}px`;
+    const activeNode = Number(node.dataset.index) === activeIndex;
+    node.classList.toggle('active', activeNode);
+  });
+}
+
+let activeIndex = 0;
+
+function setActiveNode(index) {
+  activeIndex = index;
+  const node = nodes[index];
+  if (!node) return;
+  const title = node.dataset.title;
+  const text = node.dataset.text;
+  projectTitle.textContent = title;
+  projectText.textContent = text;
+  nodes.forEach((item, idx) => item.classList.toggle('active', idx === index));
+}
+
+nodes.forEach((node, index) => {
+  node.addEventListener('pointerenter', () => setActiveNode(index));
+  node.addEventListener('focus', () => setActiveNode(index));
+});
+
 function resize() {
   w = innerWidth;
   h = innerHeight;
@@ -35,6 +72,7 @@ function resize() {
   canvas.width = w * d;
   canvas.height = h * d;
   g.setTransform(d, 0, 0, d, 0, 0);
+  updateOrbit();
 }
 
 addEventListener('resize', resize);
@@ -105,7 +143,6 @@ function point(e) {
   const rect = surface.getBoundingClientRect();
   x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
   y = 1 - Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
-  updateHud();
   if (active) tune();
 }
 
@@ -128,7 +165,6 @@ surface.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowRight') x = Math.min(1, x + 0.03);
   if (e.key === 'ArrowUp') y = Math.min(1, y + 0.05);
   if (e.key === 'ArrowDown') y = Math.max(0, y - 0.05);
-  updateHud();
   if (active) tune();
 });
 
@@ -189,8 +225,9 @@ function frame(time) {
     g.fill();
   }
 
+  updateOrbit();
   requestAnimationFrame(frame);
 }
 
-updateHud();
+setActiveNode(0);
 requestAnimationFrame(frame);

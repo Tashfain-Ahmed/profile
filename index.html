@@ -53,76 +53,147 @@
 
     <section class="profile-page">
       <header class="profile-header">
-        <p class="section-kicker">Profile</p>
-        <h2>Tashfain Ahmed</h2>
-        <p class="lead">PhD student working on speech, audio, and acoustic intelligence for real-world machine learning systems.</p>
+        <div class="header-row">
+          <div class="profile-identity">
+            <p class="section-kicker">Profile</p>
+            <h2>Tashfain Ahmed</h2>
+            <p class="role-line">PhD student • Audio Machine Learning • Speech + Acoustic Intelligence</p>
+          </div>
+
+          <div class="portrait-card" aria-label="Profile photo placeholder">
+            <div class="portrait-placeholder">Photo</div>
+          </div>
+        </div>
+
+        <div class="bio-box">
+          <p>
+            I work on speech, audio, and acoustic intelligence for real-world intelligent systems.
+            My research focuses on robust machine learning under noisy conditions, uncertainty-aware
+            evaluation, and practical deployment of audio models in everyday environments.
+          </p>
+          <div class="link-row">
+            <a href="#publications">Publications</a>
+            <a href="#projects">Projects</a>
+            <a href="#contact">Contact</a>
+          </div>
+        </div>
       </header>
 
-      <div class="profile-grid">
-        <section class="panel">
-          <p class="section-kicker">Research</p>
-          <h3>Focus</h3>
+      <div class="status-grid">
+        <section class="panel compact-panel">
+          <p class="section-kicker">Current</p>
+          <h3>Research focus</h3>
           <ul>
             <li>Audio machine learning for speech and acoustic sensing</li>
-            <li>Robust systems under noisy, real-world deployment conditions</li>
+            <li>Noise-robust systems in real-world deployments</li>
             <li>Uncertainty-aware evaluation and practical ML</li>
           </ul>
         </section>
 
-        <section class="panel">
+        <section class="panel compact-panel">
           <p class="section-kicker">Experience</p>
           <h3>Background</h3>
           <div class="entry">
-            <span class="meta">Research / ML</span>
+            <span class="meta">Research</span>
             <strong>PhD Student</strong>
-            <p>Building learnable audio systems for speech enhancement, perception, and acoustic understanding.</p>
+            <p>Designing deployable audio systems for perception and decision support.</p>
           </div>
           <div class="entry">
-            <span class="meta">AI Systems</span>
-            <strong>Applied ML</strong>
-            <p>Designing methods that remain reliable under noisy and constrained conditions.</p>
+            <span class="meta">Applied AI</span>
+            <strong>Acoustic intelligence</strong>
+            <p>Studying how signal quality, uncertainty, and context affect real systems.</p>
           </div>
         </section>
       </div>
 
-      <section class="panel publications">
-        <p class="section-kicker">Publications</p>
-        <h3>Selected work</h3>
-        <ul class="pub-list">
+      <section class="panel news-panel">
+        <p class="section-kicker">News</p>
+        <h3>Recently</h3>
+        <ul class="news-list">
           <li>
-            <span>HATCI Voice</span>
-            <p>In-cabin speech intelligence under noise, weather, and vehicle variability.</p>
+            <span class="date">2026</span>
+            <p>Working on robust in-cabin and environmental audio understanding for intelligent systems.</p>
           </li>
           <li>
-            <span>ConformalMOS</span>
-            <p>Uncertainty-aware speech quality estimation with calibrated confidence.</p>
+            <span class="date">2025</span>
+            <p>Exploring uncertainty-aware quality estimation and practical speech and audio ML methods.</p>
           </li>
           <li>
-            <span>Acoustic Sensing</span>
-            <p>Diagnostics and signal understanding through real-world audio conditions.</p>
+            <span class="date">2024</span>
+            <p>Published and developed research around acoustic sensing, speech quality, and deployable ML.</p>
           </li>
         </ul>
       </section>
 
-      <section class="projects">
-        <p class="section-kicker">Projects</p>
-        <h3>Recent work</h3>
-        <div class="project-cards">
-          <article class="mini-card">
-            <span>01</span>
-            <h4>HATCI</h4>
-            <p>Speech analysis in moving vehicle cabins using realistic noise conditions.</p>
-          </article>
-          <article class="mini-card">
-            <span>02</span>
+      <section id="publications" class="panel publications">
+        <p class="section-kicker">Publications</p>
+        <h3>Selected papers</h3>
+        <div class="pub-card">
+          <div class="pub-heading">
+            <span class="tag">WIP</span>
+            <h4>HATCI Voice</h4>
+          </div>
+          <p>Vehicle cabin intelligence under road, HVAC, and weather noise conditions.</p>
+        </div>
+
+        <div class="pub-card">
+          <div class="pub-heading">
+            <span class="tag">Paper</span>
             <h4>ConformalMOS</h4>
-            <p>Calibrated audio quality modeling for confident assessment.</p>
+          </div>
+          <p>Uncertainty-aware speech quality estimation with calibrated confidence and robust evaluation.</p>
+        </div>
+
+        <div class="pub-card">
+          <div class="pub-heading">
+            <span class="tag">Project</span>
+            <h4>Acoustic Sensing</h4>
+          </div>
+          <p>Real-world diagnostics from device variability, everyday tools, and ambient signals.</p>
+        </div>
+      </section>
+
+      <section id="projects" class="projects">
+        <p class="section-kicker">Projects</p>
+        <h3>Selected work</h3>
+        <div class="project-cards">
+          <article class="mini-card project-feature">
+            <div class="project-thumb thumb-hatci" aria-label="HATCI project placeholder"></div>
+            <div class="project-copy">
+              <span>01</span>
+              <h4>HATCI</h4>
+              <p>In-cabin speech intelligence under realistic vehicle noise and environmental variability.</p>
+            </div>
           </article>
-          <article class="mini-card">
-            <span>03</span>
-            <h4>MVD</h4>
-            <p>Resource-aware ML strategies with minimal viable data for deployment.</p>
+
+          <article class="mini-card project-feature">
+            <div class="project-thumb thumb-conformal" aria-label="ConformalMOS project placeholder"></div>
+            <div class="project-copy">
+              <span>02</span>
+              <h4>ConformalMOS</h4>
+              <p>Quality modeling and uncertainty estimation for speech and audio perception tasks.</p>
+            </div>
           </article>
+
+          <article class="mini-card project-feature">
+            <div class="project-thumb thumb-sensing" aria-label="Acoustic sensing project placeholder"></div>
+            <div class="project-copy">
+              <span>03</span>
+              <h4>Acoustic Sensing</h4>
+              <p>Real-world signal analysis for diagnostics, reliability, and low-cost sensing systems.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="contact" class="panel contact-panel">
+        <p class="section-kicker">Contact</p>
+        <h3>Links</h3>
+        <div class="contact-links">
+          <a href="mailto:tashfain.ahmed@example.com">Email</a>
+          <a href="#">Google Scholar</a>
+          <a href="#">GitHub</a>
+          <a href="#">LinkedIn</a>
         </div>
       </section>
     </section>

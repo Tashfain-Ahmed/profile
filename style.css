@@ -534,7 +534,16 @@ body.playing #hint { opacity: 0.3; }
 }
 
 @media (max-width: 860px) {
-  .profile-grid,
+  .header-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .portrait-card {
+    width: min(180px, 42vw);
+  }
+
+  .status-grid,
   .project-cards {
     grid-template-columns: 1fr;
   }
@@ -545,39 +554,6 @@ body.playing #hint { opacity: 0.3; }
 }
 
 @media (max-width: 520px) {
-  .center-copy {
-    width: min(84vw, 320px);
-  }
-
-  .eyebrow {
-    letter-spacing: 0.16em;
-  }
-
-  .detail-panel {
-    padding: 14px 15px;
-  }
-
-  .detail-panel h2 {
-    font-size: 13px;
-  }
-
-  .detail-panel p {
-    letter-spacing: 0.06em;
-  }
-
-  #hint {
-    bottom: 30px;
-  }
-
-  #note {
-    top: 22px;
-    right: 22px;
-  }
-
-  .modal-visual {
-    height: 200px;
-  }
-
   .profile-page {
     padding-left: 18px;
     padding-right: 18px;
@@ -587,5 +563,14 @@ body.playing #hint { opacity: 0.3; }
   .projects {
     padding-left: 18px;
     padding-right: 18px;
+  }
+
+  .role-line {
+    letter-spacing: 0.08em;
+  }
+
+  .news-list li {
+    grid-template-columns: 1fr;
+    gap: 4px;
   }
 }

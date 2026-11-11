@@ -2,6 +2,7 @@ const canvas = document.querySelector('#ring');
 const g = canvas.getContext('2d');
 const surface = document.querySelector('#instrument');
 const note = document.querySelector('#note');
+const floatingTags = Array.from(document.querySelectorAll('.tag, .chip'));
 
 let w = innerWidth;
 let h = innerHeight;
@@ -14,6 +15,18 @@ let last = 0;
 let audio, volume, osc, second, harmonic, filter;
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function updateHud() {
+  const driftX = (x - 0.5) * 28;
+  const driftY = (y - 0.5) * 18;
+
+  floatingTags.forEach((tag, index) => {
+    const offset = index % 2 === 0 ? 1 : -1;
+    const tx = driftX * (index * 0.3 + 0.8) + offset * 8;
+    const ty = driftY * (index * 0.35 + 0.7) + (active ? 3 : 0);
+    tag.style.transform = `translate(${tx}px, ${ty}px)`;
+  });
+}
 
 function resize() {
   w = innerWidth;
@@ -92,6 +105,7 @@ function point(e) {
   const rect = surface.getBoundingClientRect();
   x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
   y = 1 - Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+  updateHud();
   if (active) tune();
 }
 
@@ -114,6 +128,7 @@ surface.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowRight') x = Math.min(1, x + 0.03);
   if (e.key === 'ArrowUp') y = Math.min(1, y + 0.05);
   if (e.key === 'ArrowDown') y = Math.max(0, y - 0.05);
+  updateHud();
   if (active) tune();
 });
 
@@ -136,12 +151,12 @@ function frame(time) {
 
   g.clearRect(0, 0, w, h);
 
-  const r = Math.min(w * 0.32, h * 0.27, 210);
+  const r = Math.min(w * 0.34, h * 0.28, 220);
   const cx = w / 2;
   const cy = h / 2;
-  const breath = 0.96 + Math.sin(phase * 1.25) * 0.06 + energy * 0.12;
+  const breath = 0.96 + Math.sin(phase * 1.2) * 0.06 + energy * 0.13;
 
-  for (let layer = 0; layer < 7; layer += 1) {
+  for (let layer = 0; layer < 8; layer += 1) {
     g.beginPath();
 
     for (let i = 0; i <= 640; i += 1) {
@@ -156,25 +171,26 @@ function frame(time) {
       else g.lineTo(px, py);
     }
 
-    const alpha = 0.14 + layer * 0.04 + energy * 0.08;
+    const alpha = 0.12 + layer * 0.04 + energy * 0.09;
     g.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
-    g.lineWidth = layer === 0 ? 1.2 : 0.85;
+    g.lineWidth = layer === 0 ? 1.2 : 0.8;
     g.stroke();
   }
 
   if (active || energy > 0.01) {
     const angle = x * Math.PI * 2 - Math.PI / 2;
-    const dotRadius = 2.4 + energy * 1.7;
+    const dotRadius = 2.6 + energy * 1.9;
     const pulseX = cx + Math.cos(angle) * (r * 0.98);
     const pulseY = cy + Math.sin(angle) * (r * 0.98);
 
     g.beginPath();
     g.arc(pulseX, pulseY, dotRadius, 0, Math.PI * 2);
-    g.fillStyle = `rgba(255,255,255,${0.55 + energy * 0.45})`;
+    g.fillStyle = `rgba(255,255,255,${0.5 + energy * 0.5})`;
     g.fill();
   }
 
   requestAnimationFrame(frame);
 }
 
+updateHud();
 requestAnimationFrame(frame);

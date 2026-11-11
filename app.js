@@ -23,26 +23,10 @@ let audio, volume, osc, second, harmonic, filter;
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const projectData = {
-  hatci: {
-    title: 'HATCI Voice',
-    summary: 'In-cabin speech intelligence under road, HVAC, and weather noise.',
-    visual: 'hatci'
-  },
-  conformal: {
-    title: 'ConformalMOS',
-    summary: 'Uncertainty-aware speech quality prediction with calibrated confidence.',
-    visual: 'conformal'
-  },
-  mvd: {
-    title: 'Resource-Aware ML',
-    summary: 'Minimum viable data and efficient systems that stay robust in deployment.',
-    visual: 'mvd'
-  },
-  acoustic: {
-    title: 'Acoustic Sensing',
-    summary: 'Real-world diagnostics from everyday tools, devices, and signals.',
-    visual: 'acoustic'
-  }
+  hatci: { title: 'HATCI Voice', summary: 'In-cabin speech intelligence under road, HVAC, and weather noise.', visual: 'hatci' },
+  conformal: { title: 'ConformalMOS', summary: 'Uncertainty-aware speech quality prediction with calibrated confidence.', visual: 'conformal' },
+  mvd: { title: 'Resource-Aware ML', summary: 'Minimum viable data and efficient systems that stay robust in deployment.', visual: 'mvd' },
+  acoustic: { title: 'Acoustic Sensing', summary: 'Real-world diagnostics from everyday tools, devices, and signals.', visual: 'acoustic' }
 };
 
 function updateHud() {

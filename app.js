@@ -1,1 +1,180 @@
-const canvas=document.querySelector('#ring'),g=canvas.getContext('2d'),surface=document.querySelector('#instrument'),note=document.querySelector('#note');let w=innerWidth,h=innerHeight,x=.5,y=.5,active=false,energy=0,phase=0,last=0,audio,volume,osc,second,harmonic,filter;const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;function resize(){w=innerWidth;h=innerHeight;let d=Math.min(devicePixelRatio||1,2);canvas.width=w*d;canvas.height=h*d;g.setTransform(d,0,0,d,0,0)}addEventListener('resize',resize);resize();function frequency(){return 90*Math.pow(6,x)}function tune(){if(!audio)return;let t=audio.currentTime,f=frequency();osc.frequency.setTargetAtTime(f,t,.08);second.frequency.setTargetAtTime(f*2.003,t,.08);harmonic.gain.setTargetAtTime(.02+y*.12,t,.08);filter.frequency.setTargetAtTime(400+y*2200,t,.08);note.textContent=Math.round(f)+' Hz'}async function start(){active=true;document.body.classList.add('playing');try{if(!audio){audio=new(window.AudioContext||window.webkitAudioContext)();volume=audio.createGain();volume.gain.value=0;volume.connect(audio.destination);filter=audio.createBiquadFilter();filter.type='lowpass';filter.connect(volume);osc=audio.createOscillator();osc.type='sine';let gain=audio.createGain();gain.gain.value=.25;osc.connect(gain).connect(filter);osc.start();second=audio.createOscillator();second.type='triangle';harmonic=audio.createGain();second.connect(harmonic).connect(filter);second.start()}await audio.resume();if(active){tune();volume.gain.setTargetAtTime(.38,audio.currentTime,.12)}}catch{document.querySelector('#hint').textContent='Sound is unavailable in this browser. You can still play with the ring.'}}function stop(){active=false;document.body.classList.remove('playing');if(audio)volume.gain.setTargetAtTime(0,audio.currentTime,.12);note.textContent=''}function point(e){x=Math.max(0,Math.min(1,e.clientX/w));y=1-Math.max(0,Math.min(1,e.clientY/h));if(active)tune()}surface.addEventListener('pointerdown',e=>{if(e.button!==0)return;surface.setPointerCapture(e.pointerId);point(e);start()});surface.addEventListener('pointermove',point);surface.addEventListener('pointerup',stop);surface.addEventListener('pointercancel',stop);surface.addEventListener('lostpointercapture',stop);surface.addEventListener('keydown',e=>{if([' ','Enter','ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))e.preventDefault();if((e.key===' '||e.key==='Enter')&&!e.repeat)start();if(e.key==='ArrowLeft')x=Math.max(0,x-.03);if(e.key==='ArrowRight')x=Math.min(1,x+.03);if(e.key==='ArrowUp')y=Math.min(1,y+.05);if(e.key==='ArrowDown')y=Math.max(0,y-.05);if(active)tune()});surface.addEventListener('keyup',e=>{if(e.key===' '||e.key==='Enter')stop()});surface.addEventListener('blur',stop);addEventListener('blur',stop);document.addEventListener('visibilitychange',()=>{if(document.hidden)stop()});function frame(time){let dt=Math.min((time-last)/1000,.05);last=time;energy+=(Number(active)-energy)*Math.min(1,dt*7);if(!reduced)phase+=dt*(.5+energy*2);g.clearRect(0,0,w,h);let r=Math.min(w*.36,h*.29,230),cx=w/2,cy=h/2;for(let layer=0;layer<7;layer++){g.beginPath();for(let i=0;i<=640;i++){let a=i/640*Math.PI*2;let env=Math.pow(.5+.5*Math.sin(a*3-phase),2);let ripple=Math.sin(a*(14+Math.round(x*18))+phase*3+layer*.32)*(2+energy*(10+y*24))*env;let rr=r+layer*1.7+ripple+Math.sin(a*2+phase)*3;let px=cx+Math.cos(a)*rr,py=cy+Math.sin(a)*rr;if(i===0)g.moveTo(px,py);else g.lineTo(px,py)}g.strokeStyle=`rgba(230,234,226,${(.09+(6-layer)*.025)+energy*.035})`;g.lineWidth=.8;g.stroke()}if(active||energy>.01){let a=x*Math.PI*2-Math.PI/2;g.beginPath();g.arc(cx+Math.cos(a)*r,cy+Math.sin(a)*r,2,0,Math.PI*2);g.fillStyle=`rgba(240,244,235,${energy})`;g.fill()}requestAnimationFrame(frame)}requestAnimationFrame(frame);
+const canvas = document.querySelector('#ring');
+const g = canvas.getContext('2d');
+const surface = document.querySelector('#instrument');
+const note = document.querySelector('#note');
+
+let w = innerWidth;
+let h = innerHeight;
+let x = 0.5;
+let y = 0.5;
+let active = false;
+let energy = 0;
+let phase = 0;
+let last = 0;
+let audio, volume, osc, second, harmonic, filter;
+
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function resize() {
+  w = innerWidth;
+  h = innerHeight;
+  const d = Math.min(devicePixelRatio || 1, 2);
+  canvas.width = w * d;
+  canvas.height = h * d;
+  g.setTransform(d, 0, 0, d, 0, 0);
+}
+
+addEventListener('resize', resize);
+resize();
+
+function frequency() {
+  return 90 * Math.pow(6, x);
+}
+
+function tune() {
+  if (!audio) return;
+  const t = audio.currentTime;
+  const f = frequency();
+  osc.frequency.setTargetAtTime(f, t, 0.08);
+  second.frequency.setTargetAtTime(f * 2.003, t, 0.08);
+  harmonic.gain.setTargetAtTime(0.02 + y * 0.12, t, 0.08);
+  filter.frequency.setTargetAtTime(400 + y * 2200, t, 0.08);
+  note.textContent = `${Math.round(f)} Hz`;
+}
+
+async function start() {
+  active = true;
+  document.body.classList.add('playing');
+
+  try {
+    if (!audio) {
+      audio = new (window.AudioContext || window.webkitAudioContext)();
+      volume = audio.createGain();
+      volume.gain.value = 0;
+      volume.connect(audio.destination);
+
+      filter = audio.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.connect(volume);
+
+      osc = audio.createOscillator();
+      osc.type = 'sine';
+      const gain = audio.createGain();
+      gain.gain.value = 0.25;
+      osc.connect(gain).connect(filter);
+      osc.start();
+
+      second = audio.createOscillator();
+      second.type = 'triangle';
+      harmonic = audio.createGain();
+      second.connect(harmonic).connect(filter);
+      second.start();
+    }
+
+    await audio.resume();
+    if (active) {
+      tune();
+      volume.gain.setTargetAtTime(0.38, audio.currentTime, 0.12);
+    }
+  } catch {
+    document.querySelector('#hint').textContent = 'Sound is unavailable in this browser. You can still play with the ring.';
+  }
+}
+
+function stop() {
+  active = false;
+  document.body.classList.remove('playing');
+  if (audio) volume.gain.setTargetAtTime(0, audio.currentTime, 0.12);
+  note.textContent = '';
+}
+
+function point(e) {
+  const rect = surface.getBoundingClientRect();
+  x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  y = 1 - Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+  if (active) tune();
+}
+
+surface.addEventListener('pointerdown', (e) => {
+  if (e.button !== 0) return;
+  surface.setPointerCapture(e.pointerId);
+  point(e);
+  start();
+});
+
+surface.addEventListener('pointermove', point);
+surface.addEventListener('pointerup', stop);
+surface.addEventListener('pointercancel', stop);
+surface.addEventListener('lostpointercapture', stop);
+
+surface.addEventListener('keydown', (e) => {
+  if ([' ', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) e.preventDefault();
+  if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) start();
+  if (e.key === 'ArrowLeft') x = Math.max(0, x - 0.03);
+  if (e.key === 'ArrowRight') x = Math.min(1, x + 0.03);
+  if (e.key === 'ArrowUp') y = Math.min(1, y + 0.05);
+  if (e.key === 'ArrowDown') y = Math.max(0, y - 0.05);
+  if (active) tune();
+});
+
+surface.addEventListener('keyup', (e) => {
+  if (e.key === ' ' || e.key === 'Enter') stop();
+});
+
+surface.addEventListener('blur', stop);
+addEventListener('blur', stop);
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) stop();
+});
+
+function frame(time) {
+  const dt = Math.min((time - last) / 1000, 0.05);
+  last = time;
+
+  energy += (Number(active) - energy) * Math.min(1, dt * 7);
+  if (!reduced) phase += dt * (0.5 + energy * 2.2);
+
+  g.clearRect(0, 0, w, h);
+
+  const r = Math.min(w * 0.32, h * 0.27, 210);
+  const cx = w / 2;
+  const cy = h / 2;
+  const breath = 0.96 + Math.sin(phase * 1.25) * 0.06 + energy * 0.12;
+
+  for (let layer = 0; layer < 7; layer += 1) {
+    g.beginPath();
+
+    for (let i = 0; i <= 640; i += 1) {
+      const a = (i / 640) * Math.PI * 2;
+      const env = Math.pow(0.5 + 0.5 * Math.sin(a * 3 - phase), 2);
+      const ripple = Math.sin(a * (14 + Math.round(x * 18)) + phase * 3 + layer * 0.38) * (2.2 + energy * (11 + y * 18)) * env;
+      const rr = (r * breath) + layer * 2.1 + ripple + Math.sin(a * 2 + phase + layer) * 2.2;
+      const px = cx + Math.cos(a) * rr;
+      const py = cy + Math.sin(a) * rr;
+
+      if (i === 0) g.moveTo(px, py);
+      else g.lineTo(px, py);
+    }
+
+    const alpha = 0.14 + layer * 0.04 + energy * 0.08;
+    g.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
+    g.lineWidth = layer === 0 ? 1.2 : 0.85;
+    g.stroke();
+  }
+
+  if (active || energy > 0.01) {
+    const angle = x * Math.PI * 2 - Math.PI / 2;
+    const dotRadius = 2.4 + energy * 1.7;
+    const pulseX = cx + Math.cos(angle) * (r * 0.98);
+    const pulseY = cy + Math.sin(angle) * (r * 0.98);
+
+    g.beginPath();
+    g.arc(pulseX, pulseY, dotRadius, 0, Math.PI * 2);
+    g.fillStyle = `rgba(255,255,255,${0.55 + energy * 0.45})`;
+    g.fill();
+  }
+
+  requestAnimationFrame(frame);
+}
+
+requestAnimationFrame(frame);

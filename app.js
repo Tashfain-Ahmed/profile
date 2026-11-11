@@ -5,6 +5,11 @@ const note = document.querySelector('#note');
 const projectTitle = document.querySelector('#projectTitle');
 const projectText = document.querySelector('#projectText');
 const nodes = Array.from(document.querySelectorAll('.node'));
+const modal = document.querySelector('#projectModal');
+const closeModalButton = document.querySelector('.close-modal');
+const modalTitle = document.querySelector('#modalTitle');
+const modalSummary = document.querySelector('#modalSummary');
+const modalVisuals = Array.from(document.querySelectorAll('.modal-visual'));
 
 let w = innerWidth;
 let h = innerHeight;
@@ -17,33 +22,38 @@ let last = 0;
 let audio, volume, osc, second, harmonic, filter;
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const projectData = {
+  hatci: {
+    title: 'HATCI Voice',
+    summary: 'In-cabin speech intelligence under road, HVAC, and weather noise.',
+    visual: 'hatci'
+  },
+  conformal: {
+    title: 'ConformalMOS',
+    summary: 'Uncertainty-aware speech quality prediction with calibrated confidence.',
+    visual: 'conformal'
+  },
+  mvd: {
+    title: 'Resource-Aware ML',
+    summary: 'Minimum viable data and efficient systems that stay robust in deployment.',
+    visual: 'mvd'
+  },
+  acoustic: {
+    title: 'Acoustic Sensing',
+    summary: 'Real-world diagnostics from everyday tools, devices, and signals.',
+    visual: 'acoustic'
+  }
+};
 
 function updateHud() {
   const driftX = (x - 0.5) * 28;
   const driftY = (y - 0.5) * 18;
 
-  floatingTags.forEach((tag, index) => {
+  nodes.forEach((node, index) => {
     const offset = index % 2 === 0 ? 1 : -1;
     const tx = driftX * (index * 0.3 + 0.8) + offset * 8;
     const ty = driftY * (index * 0.35 + 0.7) + (active ? 3 : 0);
-    tag.style.transform = `translate(${tx}px, ${ty}px)`;
-  });
-}
-
-function updateOrbit() {
-  const orbitRadius = Math.min(w, h) * 0.22;
-  const centerX = w / 2;
-  const centerY = h / 2;
-  const baseAngles = [0.4, 1.3, 2.3, 3.6];
-
-  nodes.forEach((node, index) => {
-    const angle = baseAngles[index] + phase * 0.3;
-    const px = centerX + Math.cos(angle) * orbitRadius;
-    const py = centerY + Math.sin(angle) * orbitRadius * 0.9;
-    node.style.left = `${px}px`;
-    node.style.top = `${py}px`;
-    const activeNode = Number(node.dataset.index) === activeIndex;
-    node.classList.toggle('active', activeNode);
+    node.style.transform = `translate(${tx}px, ${ty}px)`;
   });
 }
 
@@ -60,9 +70,38 @@ function setActiveNode(index) {
   nodes.forEach((item, idx) => item.classList.toggle('active', idx === index));
 }
 
+function openProject(projectKey) {
+  const data = projectData[projectKey];
+  if (!data) return;
+
+  modalTitle.textContent = data.title;
+  modalSummary.textContent = data.summary;
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+
+  modalVisuals.forEach((scene) => {
+    const isActive = scene.dataset.scene === data.visual;
+    scene.classList.toggle('active', isActive);
+  });
+}
+
+function closeProject() {
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+}
+
 nodes.forEach((node, index) => {
   node.addEventListener('pointerenter', () => setActiveNode(index));
   node.addEventListener('focus', () => setActiveNode(index));
+  node.addEventListener('click', () => openProject(node.dataset.project));
+});
+
+closeModalButton.addEventListener('click', closeProject);
+modal.addEventListener('click', (e) => {
+  if (e.target.dataset.close === 'true') closeProject();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && modal.classList.contains('open')) closeProject();
 });
 
 function resize() {
@@ -178,6 +217,23 @@ document.addEventListener('visibilitychange', () => {
   if (document.hidden) stop();
 });
 
+function updateOrbit() {
+  const orbitRadius = Math.min(w, h) * 0.22;
+  const centerX = w / 2;
+  const centerY = h / 2;
+  const baseAngles = [0.4, 1.3, 2.3, 3.6];
+
+  nodes.forEach((node, index) => {
+    const angle = baseAngles[index] + phase * 0.3;
+    const px = centerX + Math.cos(angle) * orbitRadius;
+    const py = centerY + Math.sin(angle) * orbitRadius * 0.9;
+    node.style.left = `${px}px`;
+    node.style.top = `${py}px`;
+    const activeNode = Number(node.dataset.index) === activeIndex;
+    node.classList.toggle('active', activeNode);
+  });
+}
+
 function frame(time) {
   const dt = Math.min((time - last) / 1000, 0.05);
   last = time;
@@ -226,6 +282,7 @@ function frame(time) {
   }
 
   updateOrbit();
+  updateHud();
   requestAnimationFrame(frame);
 }
 
